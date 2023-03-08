@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.green2209S_20.dao.CouponsDAO">
+	
+	<select id="getLastIdx" resultType="String">
+		select idx from coupons order by idx desc limit 1;
+	</select>
+	<select id="totRecCnt" resultType="int">
+		select count(*) from coupons;
+	</select>
+	<select id="getCouponList" resultType="com.spring.green2209S_20.vo.CouponsVO">
+		select * from coupons order by idx desc limit #{startIndexNo},#{pageSize};
+	</select>
+	<select id="getCoupon" resultType="com.spring.green2209S_20.vo.CouponsVO">
+		select * from coupons where code=#{code}; 
+	</select>
+	
+	<insert id="setCouponInput">
+		insert into coupons values (default,#{vo.code},#{vo.name},#{vo.fSName},#{vo.price},'OK',#{vo.startDate},#{vo.lastDate},null,0);
+	</insert>
+	
+	<update id="setCouponUpdate">
+		update coupons set useDate=now(), useSw='NO' where idx =#{couponIdx};
+	</update>
+	
+	<delete id="setCouponDelete">
+		delete from coupons where idx =${idx} and useSw!='NO';
+	</delete>
+	
+</mapper>

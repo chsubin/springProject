@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.green2209S_20.dao.QnaDAO">
+
+	<select id="getQnaList" resultType="com.spring.green2209S_20.vo.QnaVO">
+		select * from qnas where questionId=#{mid} and ${sw}!='x' <if test="mid!=''"> or questionId='' </if>;
+	</select>
+	<select id="getQnaAdminList" resultType="com.spring.green2209S_20.vo.QnaVO">
+		select * from qnas where questionId!='' and answerSw!='x' group by questionId order by idx desc limit #{startIndexNo},#{pageSize}  ;
+	</select>
+	<select id="getQnaMidList" resultType="com.spring.green2209S_20.vo.QnaVO">
+		select q.*,(select answerSw from qnas where q.questionId=questionId order by  answerSw limit 1) as aSw,(select answerDate from qnas order by answerDate limit 1) as aDate 
+		,(select questionDate from qnas where questionId=q.questionId order by questionDate desc limit 1) as qDate from qnas q
+		where questionId!='' and q.answerSw!='x' order by idx desc
+		limit #{startIndexNo},#{pageSize} ;
+	</select>
+	<select id="totRecCnt" resultType="int">
+		select count(*)  from qnas where questionId!='';
+	</select>
+	<select id="getQnaAdminUnConfirmCnt" resultType="com.spring.green2209S_20.vo.QnaVO">
+		select * from qnas where answerSw='n' group by questionId;
+	</select>
+	<select id="getFAQList"  resultType="com.spring.green2209S_20.vo.QnaVO">
+		select * from  qnas where level=0;
+	</select>
+	
+	<insert id="setQnaInput">
+			insert into qnas values (default,#{vo.part},#{vo.question},#{vo.questionId},'s',default,'','n',null,1);
+	</insert>
+	<insert id="setQnaAnswerInput">
+		insert into qnas values (default,'','',#{vo.questionId},'n',null,#{vo.answer},'n',now(),1);
+	</insert>
+	
+	<update id="setAnswerSwUpdate">
+		update qnas set answerSw='s' where questionId=#{questionId} and answerSw='n';
+	</update>
+	<update id="setQnaExit">
+		update qnas set answerSw='x' where questionId=#{questionId};
+	</update>
+	<update id="setQnaAdminDelete">
+		update qnas set answerSw='x' where idx=#{idx};
+	</update>
+	<update id="setQnaUpdateAnswer">
+		update qnas set  answer=#{answer}, answerDate=now() where idx =#{idx};
+	</update>
+	<update id="setQnaUpdateLevel">
+		update qnas set level=#{level} where idx =#{idx};
+	</update>
+	
+	
+	<delete id="setAdminDelete">
+		delete from qnas where questionId='';
+	</delete>
+	
+</mapper>

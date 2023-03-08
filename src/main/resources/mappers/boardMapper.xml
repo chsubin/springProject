@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.green2209S_20.dao.BoardDAO">
+	
+	<select id="totRecCnt" resultType="int">
+		<if test="sw!=2 and sw!=9">
+		select count(*) from boards where sw=#{sw} <if test="part!=''"><if test="search!=''"> and ${part} like concat('',#{search},'') </if></if>;
+		</if>
+		<if test="sw==2">
+		select count(*) from boards b, orders o,products p,dbOption d
+		 where sw=#{sw} and b.oIdx=o.idx and o.productIdx=p.idx and d.productIdx=p.idx and o.optionIdx=d.idx 
+		 <if test="part!=''"><if test="search!=''">and ${part} like concat('%',#{search},'%') </if></if>;
+		</if>
+		<if test="sw==9">
+		select count(*) from boards b, orders o,products p,dbOption d
+		 where sw=2 and b.oIdx=o.idx and o.productIdx=p.idx and d.productIdx=p.idx and o.optionIdx=d.idx 
+		 <if test="part!=''"><if test="search!=''">and ${part} = #{search}</if></if>;
+		</if>
+	</select>
+	<select id="getboardListSw" resultType="com.spring.green2209S_20.vo.BoardVO">
+		<if test="sw!=2 and sw!=9">
+		select *,datediff(now(), wDate) as day_diff,timestampdiff(hour, wDate, now()) as hour_diff,(SELECT count(*)	FROM boardsReply WHERE boardIdx=b.idx) as replyCount  from boards b
+		 where sw=#{sw} order by idx desc limit #{startIndexNo},#{pageSize};
+		</if>
+		<if test="sw==2">
+		select b.*,o.idx,p.name as productName,p.fSName as productfSName,d.optionName as optionName
+		,datediff(now(), wDate) as day_diff,timestampdiff(hour, wDate, now()) as hour_diff,(SELECT count(*)	FROM boardsReply WHERE boardIdx=b.idx) as replyCount  from boards b, orders o,products p,dbOption d
+		 where sw=#{sw} and b.oIdx=o.idx and o.productIdx=p.idx and d.productIdx=p.idx and o.optionIdx=d.idx 
+		 <if test="part!=''"><if test="search!=''">and ${part} like concat('%',#{search},'%') </if></if>
+		  order by b.idx desc limit #{startIndexNo},#{pageSize};
+		</if>
+		<if test="sw==9">
+		select b.*,o.idx,p.name as productName,p.fSName as productfSName,d.optionName as optionName
+		,datediff(now(), wDate) as day_diff,timestampdiff(hour, wDate, now()) as hour_diff,(SELECT count(*)	FROM boardsReply WHERE boardIdx=b.idx) as replyCount  from boards b, orders o,products p,dbOption d
+		 where sw=2 and b.oIdx=o.idx and o.productIdx=p.idx and d.productIdx=p.idx and o.optionIdx=d.idx 
+		 <if test="part!=''"><if test="search!=''">and ${part} = #{search} </if></if>
+		  order by b.idx desc limit #{startIndexNo},#{pageSize};
+		</if>
+	</select>
+	<select id="getBoardContent" resultType="com.spring.green2209S_20.vo.BoardVO">
+		<if test="sw!=2">
+			select * from boards where idx=${idx};
+		</if>
+		<if test="sw==2">
+			select b.*,o.idx,p.name as productName,p.fSName as productfSName,p.fName as productfName,d.optionName as optionName
+			,datediff(now(), wDate) as day_diff,timestampdiff(hour, wDate, now()) as hour_diff,(SELECT count(*)	FROM boardsReply WHERE boardIdx=b.idx) as replyCount  from boards b, orders o,products p,dbOption d
+			 where sw=#{sw} and b.oIdx=o.idx and o.productIdx=p.idx and d.productIdx=p.idx and o.optionIdx=d.idx and b.idx=#{idx};
+		</if>
+	</select>
+	<select id="getBoardPrevNext" resultType="com.spring.green2209S_20.vo.BoardVO">
+		<if test="sw=='prev'">
+			select * from boards where <![CDATA[idx<#{idx}]]> and sw=#{sw1} order by idx desc limit 1;
+		</if>
+		<if test="sw=='next'">
+			select * from boards where <![CDATA[idx>#{idx}]]> and sw=#{sw1} limit 1;
+		</if>
+	</select>
+	<select id="getReplyList" resultType="com.spring.green2209S_20.vo.BoardsReplyVO">
+		select * from boardsReply where boardIdx =#{idx} order by pIdx,level,idx;
+	</select>
+	<select id="getReply" resultType="com.spring.green2209S_20.vo.BoardsReplyVO">
+		select * from boardsReply where idx =#{idx};
+	</select>
+	<select id="getReplyByPidx" resultType="com.spring.green2209S_20.vo.BoardsReplyVO">
+		select * from boardsReply where pidx=#{pidx};
+	</select>
+	
+	
+	<insert id="setBoardInput">
+		<if test="vo.sw==1">
+			insert into boards values(default,#{vo.mid},#{vo.title},#{vo.content},now(),#{vo.sw},0,'','',default,default,default);
+		</if>
+		<if test="vo.sw==2">
+			insert into boards values(default,#{vo.mid},#{vo.title},#{vo.content},now(),#{vo.sw},#{vo.OIdx},#{vo.fName},#{vo.fSName},default,default,default);
+		</if>
+	</insert>
+	<insert id="setBoardReplyInput">
+		insert into boardsReply values(default,#{vo.boardIdx},#{vo.level},#{vo.PIdx},#{vo.mid},#{vo.content},default);
+	</insert>
+	
+	<update id="setBoardUpdate">
+		<if test="vo.sw!=2"> update boards set title=#{vo.title},content=#{vo.content} where idx= #{vo.idx};</if>
+		<if test="vo.sw==2"> update boards set title=#{vo.title},content=#{vo.content},fName=#{vo.FName},fSName=#{vo.FSName} where idx= #{vo.idx};</if>
+	</update>
+	<update id="setBoardReplyUpdatePidx">
+		update boardsReply set pIdx = idx where level=0;
+	</update>
+	<update id="setReplyUpdate">
+		update boardsReply set content =#{content} where idx =#{idx};
+	</update>
+	<update id="setboardDeleteUpdate">
+		update boardsReply set content ='삭제된 댓글입니다.' where idx =#{idx};
+	</update>
+	<update id="setBoardViewsUpdate">
+		update boards set views=views+1 where idx =#{idx};
+	</update>
+	<update id="setLikeUpdate">
+		<if test="buho==1"> update boards set ${flag}=${flag}+1 where idx =#{idx};</if>
+		<if test="buho==-1"> update boards set ${flag}=${flag}-1 where idx =#{idx};</if>
+	</update>
+	
+	<delete id="setBoardDelete">
+		delete from boards where idx =#{idx};
+	</delete>
+	<delete id="setBoardReplyDelete">
+		delete from boardsReply where idx =#{idx};
+	</delete>
+	
+	
+</mapper>

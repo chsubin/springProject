@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.green2209S_20.dao.OrdersDAO">
+
+	<select id="getSmallCategoryList" resultType="com.spring.green2209S_20.vo.CategorySmallVO">
+		select * from categorySmall <if test="codeLarge!=0"> where codeLarge=#{codeLarge} </if>;
+	</select>
+	<select id="totRecCnt" resultType="String">
+		<if test="codeLarge==0">
+			select count(*) from products;
+		</if>
+		<if test="codeLarge!=0">
+			select count(*) from products where codeLarge=#{codeLarge} <if test="codeSmall!=0"> and codeSmall=#{codeSmall}</if>;
+		</if>
+	</select>
+	<select id="getProductList" resultType="com.spring.green2209S_20.vo.ProductVO">
+		select p.*,l.largeName,s.smallName
+		,(select count(*) from orders o where o.productIdx = p.idx and o.orderSw!=0) as orders
+		,(select count(*) from boards r,orders o where r.oIdx = o.idx  and o.productIdx = p.idx) as reviews
+		 from products p, categorySmall s,categoryLarge l
+ 			where p.codeLarge=l.codeLarge and p.codeSmall = s.codeSmall <if test="codeLarge!=0"> and p.codeLarge=#{codeLarge} </if> <if test="codeSmall!=0">and p.codeSmall=#{codeSmall}</if>
+ 			<if test="orderBy==''"> order by p.idx desc limit #{startIndexNo},#{pageSize} </if> 
+ 			<if test="orderBy!=''"> order by ${orderBy} desc limit #{startIndexNo},#{pageSize} </if>;
+	</select>
+	<select id="getProduct" resultType="com.spring.green2209S_20.vo.ProductVO">
+		select p.*,l.largeName,s.smallName from products p, categorySmall s,categoryLarge l where idx=#{idx} and p.codeLarge=l.codeLarge and p.codeSmall = s.codeSmall;
+	</select>
+	<select id="getOptionList" resultType="com.spring.green2209S_20.vo.DBoptionVO">
+		select * from DBoption where productIdx=#{productIdx};
+	</select>
+	<select id="getOption" resultType="com.spring.green2209S_20.vo.DBoptionVO">
+		select * from DBoption where idx=#{idx};
+	</select>
+	<select id="getBucketList" resultType="com.spring.green2209S_20.vo.BucketVO">
+		select * from bucket where mid=#{vo.mid} and productIdx=#{vo.productIdx} and optionIdx=#{vo.optionIdx};
+	</select>
+	<select id="totRecOrdersCnt" resultType="int">
+		select count(*) from orders where orderSw!=0 <if test="part!=''"> and ${part}=#{search} </if> and subSw='' <if test="orderSw!=99">and orderSw=#{orderSw}</if>; 
+	</select>
+	<select id="totRecSubCnt" resultType="int">
+			select count(*) from orders where orderSw!=0 and subSw!='' <if test="subSw!=''"> and subSw=#{subSw} </if> <if test="part!=''"> and ${part}=#{search} </if> <if test="orderSw!=99"> and orderSw=#{orderSw} </if>;
+	</select>
+	<select id="getUsableCoupons" resultType="com.spring.green2209S_20.vo.CouponsVO">
+			select * from coupons where code=#{code} and <![CDATA[startDate<=now()]]> and <![CDATA[now()<=lastDate]]> and useSw='OK';
+	</select>
+	
+	<select id="getOrdersList" resultType="com.spring.green2209S_20.vo.OrdersVO">
+		select o.*,p.name as productName,p.fSName as fSName,d.optionName as optionName
+		 from orders o,products p,DBoption d
+		  where  p.idx=o.productIdx and d.idx= o.optionIdx <if test="part!=''"> and ${part}=#{search} </if> 
+	    and o.subSw='' <if test="orderSw!=99"> and o.orderSw=#{orderSw}</if> and orderSw!=0 
+	   order by idx desc limit #{startIndexNo},#{pageSize};
+	</select>
+	
+	<select id="getSubsList" resultType="com.spring.green2209S_20.vo.OrdersVO">
+		select o.*,p.name as productName,p.fSName as fSName,d.optionName as optionName
+		,(select Ddate from subscribe where o.idx=oIdx order by idx desc limit 1) as dDate
+		 from orders o,products p,DBoption d where p.idx=o.productIdx and d.idx= o.optionIdx and o.orderSw!=0 and subSw!=''
+		 <if test="part!=''"> and ${part}=#{search}  </if> <if test="subSw!=''"> and subSw=#{subSw} </if>
+		 <if test="orderSw!=99"> and orderSw=#{orderSw} </if>
+		  order by idx desc limit #{startIndexNo},#{pageSize};
+	</select>
+	<select id="getOrderSub" resultType="com.spring.green2209S_20.vo.OrderSubVO">
+		select *,(select price from coupons where o.couponIdx=idx) as couponPrice from orderSub o where  oIdx=#{oIdx};
+	</select>
+	
+	
+	
+	<select id="getOrders" resultType="com.spring.green2209S_20.vo.OrdersVO">
+		select o.*,p.name as productName,p.fSName as fSName,d.optionName as optionName  from orders o,products p,DBoption d where o.orderIdx=#{orderIdx} and p.idx=o.productIdx and d.idx= o.optionIdx ;
+	</select>
+	<select id="getOrder" resultType="com.spring.green2209S_20.vo.OrdersVO">
+		select o.*,p.name as productName,p.fSName as fSName,d.optionName as optionName  from orders o,products p,DBoption d where o.idx=#{idx} and p.idx=o.productIdx and d.idx= o.optionIdx ;
+	</select>
+	
+	<insert id="setProductBucketInput">
+		<if test="vo.optionDetail!=''">
+			insert into bucket values (default,#{vo.mid},#{vo.productIdx},#{vo.optionIdx},#{vo.optionNum},#{vo.optionDetail},#{vo.totalPrice},'OK');
+		</if>
+		<if test="vo.optionDetail==''">
+			insert into bucket values (default,#{vo.mid},#{vo.productIdx},#{vo.optionIdx},#{vo.optionNum},default,#{vo.totalPrice},'');
+		</if>
+	</insert>
+	<insert id="setOrders">
+		<if test="vo.optionDetail==''">
+			insert into orders values (default,#{vo.orderIdx},#{vo.mid},#{vo.name},#{vo.email},#{vo.address},#{vo.tel},#{vo.productIdx},#{vo.optionIdx},#{vo.optionNum},#{vo.optionDetail},#{vo.totalPrice},#{vo.orderSw},default,default);
+		</if>
+		<if test="vo.optionDetail!=''">
+			insert into orders values (default,#{vo.orderIdx},#{vo.mid},#{vo.name},#{vo.email},#{vo.address},#{vo.tel},#{vo.productIdx},#{vo.optionIdx},#{vo.optionNum},#{vo.optionDetail},#{vo.totalPrice},#{vo.orderSw},default,'OK');
+		</if>
+	</insert>
+	<insert id="setOrderSub">
+		insert into orderSub values (default,#{vo.oIdx},#{vo.deliveryPrice},#{vo.point},#{vo.couponIdx},#{vo.totalPrice},0);		
+	</insert>
+	
+	
+	<update id="setBucketUpdate">
+		update bucket set optionNum=optionNum+#{vo.optionNum},totalPrice=totalPrice+#{vo.totalPrice} where mid=#{vo.mid} and productIdx=#{vo.productIdx} and optionIdx=#{vo.optionIdx};
+	</update>
+	<update id="setOrdersUpdateSw">
+		update orders set orderSw=1 where orderIdx=#{orderIdx};
+	</update>
+	<update id="setOrderUpdateSw">
+		update orders set orderSw=#{orderSw} where idx=${idx};
+	</update>
+	<update id="setorderSubUpdateRefundCoupon">
+		update orderSub set refundCoupon = refundCoupon+#{couponUse} where oIdx=#{orderIdx};
+	</update>
+	
+	<delete id="setBucketDelete">
+		delete from bucket where mid =#{mid};	
+	</delete>
+	
+</mapper>

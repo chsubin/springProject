@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.green2209S_20.dao.MemberDAO">
+
+	<select id="memberIdCheck" resultType="com.spring.green2209S_20.vo.MemberVO">
+		select * from members where mid=#{mid};
+	</select>
+	<select id="getMemberList" resultType="com.spring.green2209S_20.vo.MemberVO">
+		select * from members where idx !=0 <if test="searchLevel!=99"> and level=#{searchLevel} </if><if test="part!=''"><if test="search!=''"> and ${part} like concat('%',#{search},'%') </if></if>  order by idx desc limit #{startIndexNo},#{pageSize};
+	</select>
+	<select id="totRecCnt" resultType="int">
+		select count(*) from members where idx !=0 <if test="searchLevel!=99"> and level=#{searchLevel} </if><if test="part!=''"><if test="search!=''"> and ${part} like concat('%',#{search},'%') </if></if> ;
+	</select>
+	<select id="getMemberBucket" resultType="com.spring.green2209S_20.vo.BucketVO">
+		select *,p.name as name, o.optionName,p.fSName as fSName,p.sellSw as sellSw,p.price,o.optionPrice
+		from bucket b,products p,dboption o
+		where b.mid=#{mid} 
+		and p.idx = b.productIdx
+		and o.idx = b.optionIdx;
+	</select>
+	<select id="getMemberMidSearch" resultType="com.spring.green2209S_20.vo.MemberVO">
+		select * from members where name=#{name} and email=#{email};
+	</select>
+	<select id="getMemberFromEmail" resultType="com.spring.green2209S_20.vo.MemberVO">
+		select * from members where email=#{email};
+	</select>
+	
+	<insert id="setMemberJoin">
+		<if test="vo.level!=3">
+			insert into members values (default,#{vo.mid},#{vo.name},#{vo.pwd},#{vo.address},#{vo.tel},#{vo.gender},#{vo.birthday},#{vo.email},${vo.level},default,default,default,default,point,default,#{vo.receiveSw},now(),now());
+		</if>
+		<if test="vo.level==3">
+			insert into members values (default,#{vo.mid},#{vo.name},#{vo.pwd},#{vo.address},#{vo.tel},'',default,#{vo.email},${vo.level},#{vo.comname},#{vo.comnumber},#{vo.owner},#{vo.compart},point,default,#{vo.receiveSw},now(),now());
+		</if>
+	</insert>
+	
+	<update id="setLastDateUpdate">
+		update members set lastDate=now();	
+	</update>
+	<update id="setMemberPwdUpdate">
+		update members set pwd=#{pwd} where mid=#{mid};	
+	</update>
+	<update id="setMemberPointUpdate">
+		update members set point=point+#{point} where mid=#{mid};	
+	</update>
+	<update id="bucketUpdate">
+		update bucket set optionNum=optionNum+ #{buho} where idx=#{idx};
+		update bucket set totalPrice= optionNum*#{price};	
+	</update>
+	<update id="setMemberUpdate">
+		update members set name=#{vo.name},address=#{vo.address},tel=#{vo.tel},email=#{vo.email},receiveSw=#{vo.receiveSw} <if test="vo.level==3">,comname=#{vo.comname},comnumber=#{vo.comnumber},owner=#{vo.owner},compart=#{vo.compart} </if> <if test="vo.level!=3">,gender=#{vo.gender},birthday=#{vo.birthday} </if>  where mid=#{vo.mid};	
+	</update>
+	<update id="setMemberDelete">
+		update members set userDel='OK' where mid =#{mid};	
+	</update>
+	
+	<delete id="setBucketDelete">
+		delete from bucket where idx=${idx};
+	</delete>
+	
+</mapper>

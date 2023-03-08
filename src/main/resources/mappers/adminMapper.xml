@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.green2209S_20.dao.AdminDAO">
+
+	<select id="getLargeCategoryList" resultType="com.spring.green2209S_20.vo.CategoryLargeVO">
+		select * from categoryLarge;
+	</select>
+	
+	<select id="getSubDetail" resultType="com.spring.green2209S_20.vo.CategoryLargeVO">
+		select * from categoryLarge where codeLarge=#{codeLarge};
+	</select>
+	
+	<select id="getSmallCategoryList" resultType="com.spring.green2209S_20.vo.CategorySmallVO">
+		select * from categorySmall;
+	</select>
+	
+	<select id="getSmallCategory" resultType="com.spring.green2209S_20.vo.CategorySmallVO">
+		select * from categorySmall where codeLarge=#{codeLarge};
+	</select>
+	
+	<select id="getProductLastIdx" resultType="String">
+		select idx from products order by idx desc limit 1;
+	</select>
+	
+	<select id="getBasis" resultType="com.spring.green2209S_20.vo.BasisVO">
+		select * from basis;
+	</select>
+	
+	<select id="totRecOrdersCnt" resultType="int">
+		<if test="orderSw!=0">
+			select count(*) from orders o,products p,DBoption d  where orderSw!=0  and subSw='' 
+			 and p.idx=o.productIdx and d.idx= o.optionIdx and o.subSw=''
+			 <if test="orderSw!=99">and o.orderSw=#{orderSw}</if>
+			  <if test="startDate!=''"> and o.orderDate>=#{startDate}</if>  
+			  <if test="lastDate!=''"> and <![CDATA[o.orderDate<=#{lastDate}]]> </if>
+			  <if test="part=='mid' and search!='' "> and o.mid like concat('%',#{search},'%') </if> 
+			  <if test="part=='productName' and search!='' "> and p.name like concat('%',#{search},'%') </if> 
+			  <if test="part=='orderIdx' and search!='' "> and o.orderIdx like concat('%',#{search},'%') </if> ;
+	  </if> 
+		<if test="orderSw==0">
+			select count(*) from orders o,products p,DBoption d  where
+			 p.idx=o.productIdx and d.idx= o.optionIdx 
+			 <if test="orderSw!=99">and o.orderSw=#{orderSw}</if>
+			  <if test="startDate!=''"> and o.orderDate>=#{startDate}</if>  
+			  <if test="lastDate!=''"> and <![CDATA[o.orderDate<=#{lastDate}]]> </if>
+			  <if test="part=='mid' and search!='' "> and o.mid like concat('%',#{search},'%') </if> 
+			  <if test="part=='productName' and search!='' "> and p.name like concat('%',#{search},'%') </if> 
+			  <if test="part=='orderIdx' and search!='' "> and o.orderIdx like concat('%',#{search},'%') </if> ;
+	  </if> 
+</select>
+<select id="totRecSubCnt" resultType="int">
+	select count(*) from orders o,products p,DBoption d  where o.orderSw!=0   
+	 and p.idx=o.productIdx and d.idx= o.optionIdx and o.subSw!=''
+	 <if test="orderSw!=99">and o.orderSw=#{orderSw}</if>
+	 <if test="subSw!=''"> and subSw=#{subSw} </if>
+	  <if test="startDate!=''"> and o.orderDate>=#{startDate}</if>  
+	  <if test="lastDate!=''"> and <![CDATA[o.orderDate<=#{lastDate}]]> </if>
+	  <if test="sstartDate!=''"> and o.idx not in (select oIdx from subscribe where o.idx=oIdx and
+	   <![CDATA[dDate>=#{sstartDate}]]> and <![CDATA[dDate<=#{slastDate}]]>)</if>
+	  <if test="part=='mid' and search!='' "> and o.mid like concat('%',#{search},'%') </if> 
+	  <if test="part=='productName' and search!='' "> and p.name like concat('%',#{search},'%') </if> 
+	  <if test="part=='orderIdx' and search!='' "> and o.orderIdx like concat('%',#{search},'%') </if> 
+	  <if test="part=='optionName' and search!='' "> and d.optionName like concat('%',#{search},'%') </if> 
+	  ; 
+</select>
+
+	<select id="getOrdersList" resultType="com.spring.green2209S_20.vo.OrdersVO">
+		<if test="orderSw!=0">
+			select o.*,p.name as productName,p.fSName as fSName,d.optionName as optionName
+			 from orders o,products p,DBoption d
+			 where  p.idx=o.productIdx and d.idx= o.optionIdx 
+		   and o.subSw=''  <if test="orderSw!=99"> and o.orderSw=#{orderSw}</if> and orderSw!=0 
+		   <if test="startDate!=''"> and o.orderDate>=#{startDate}</if>  
+		  <if test="lastDate!=''"> and <![CDATA[o.orderDate<=#{lastDate}]]> </if> 
+		  <if test="part=='mid' and search!='' "> and o.mid like concat('%',#{search},'%') </if> 
+		  <if test="part=='productName' and search!='' "> and p.name like concat('%',#{search},'%') </if> 
+		  <if test="part=='orderIdx' and search!='' "> and o.orderIdx like concat('%',#{search},'%') </if> 
+		   order by idx desc limit #{startIndexNo},#{pageSize};
+	   </if>
+		<if test="orderSw==0">
+			select o.*,p.name as productName,p.fSName as fSName,d.optionName as optionName
+			 from orders o,products p,DBoption d
+			 where  p.idx=o.productIdx and d.idx= o.optionIdx 
+		   <if test="orderSw!=99"> and o.orderSw=#{orderSw}</if>  
+		   <if test="startDate!=''"> and o.orderDate>=#{startDate}</if>  
+		  <if test="lastDate!=''"> and <![CDATA[o.orderDate<=#{lastDate}]]> </if> 
+		  <if test="part=='mid' and search!='' "> and o.mid like concat('%',#{search},'%') </if> 
+		  <if test="part=='productName' and search!='' "> and p.name like concat('%',#{search},'%') </if> 
+		  <if test="part=='orderIdx' and search!='' "> and o.orderIdx like concat('%',#{search},'%') </if> 
+		   order by idx desc limit #{startIndexNo},#{pageSize};
+	   </if>
+	</select>
+	<select id="getSubsList" resultType="com.spring.green2209S_20.vo.OrdersVO">
+		select o.*,p.name as productName,p.fSName as fSName,d.optionName as optionName 
+		,(select Ddate from subscribe where o.idx=oIdx <if test="sstartDate!=''"> and <![CDATA[dDate<=#{slastDate}]]> </if> order by idx desc  limit 1) as dDate  
+		 from orders o,products p,DBoption d
+		 where  p.idx=o.productIdx and d.idx= o.optionIdx 
+	   and o.subSw!='' <if test="subSw!=''"> and subSw=#{subSw} </if> and orderSw!=0 
+	   <if test="startDate!=''"> and o.orderDate>=#{startDate}</if>  
+	  <if test="lastDate!=''"> and <![CDATA[o.orderDate<=#{lastDate}]]> </if> 
+	  <if test="sstartDate!=''"> and o.idx not in (select oIdx from subscribe where o.idx=oIdx and <![CDATA[dDate>=#{sstartDate}]]> and <![CDATA[dDate<=#{slastDate}]]>)</if>
+	  <if test="part=='mid' and search!='' "> and o.mid like concat('%',#{search},'%') </if> 
+	  <if test="part=='productName' and search!='' "> and p.name like concat('%',#{search},'%') </if> 
+	  <if test="part=='orderIdx' and search!='' "> and o.orderIdx like concat('%',#{search},'%') </if>
+	  <if test="part=='optionName' and search!='' "> and d.optionName like concat('%',#{search},'%') </if> 
+	   order by o.idx desc limit #{startIndexNo},#{pageSize};
+	</select>
+	
+	<insert id="setCategoryInput">
+		insert into categorySmall values (#{vo.codeLarge},default,#{vo.smallName},#{vo.content});
+	</insert>
+	<insert id="setProductInput">
+		insert into products values (default,#{vo.codeLarge},#{vo.codeSmall},#{vo.code},#{vo.name},#{vo.content},#{vo.detail},0,#{vo.contry},#{vo.selloption},#{vo.delivery},0,#{vo.FName},#{vo.FSName},#{vo.price},default);
+	</insert>
+	<insert id="setOptionInput">
+		insert into DBoption values (default,#{vo.productIdx},#{vo.optionName},#{vo.optionPrice});
+	</insert>
+	
+	<update id="setSubContentUpdate">
+		update categoryLarge set content=#{content} where codeLarge=#{codeLarge};
+	</update>
+	
+	<update id="setProductUpdate">
+		update products set codeLarge=#{vo.codeLarge},codeSmall=#{vo.codeSmall},code=#{vo.code},name=#{vo.name},content=#{vo.content},detail=#{vo.detail},contry=#{vo.contry},selloption=#{vo.selloption},delivery=#{vo.delivery},deliveryPrice=#{vo.deliveryPrice},fName=#{vo.fName},fSName=#{vo.fSName},price=#{vo.price} where idx=#{vo.idx}
+	</update>
+	<update id="setOptionUpdate">
+		update dbOption set optionName=#{vo.optionName},optionPrice=#{vo.optionPrice} where idx =#{vo.idx};
+	</update>
+	<update id="setCategoryUpdate">
+		update categorySmall set codeLarge=#{vo.codeLarge},smallName=#{vo.smallName},content=#{vo.content} where codeSmall=#{vo.codeSmall};
+	</update>
+	<update id="setMemberLevelUpdate">
+		update members set level =#{level} where idx =#{idx};
+	</update>
+	<update id="setBasisUpdate">
+		update basis set deliveryPrice =#{vo.deliveryPrice} , deliveryMinPrice =#{vo.deliveryMinPrice},deliveryDetail =#{vo.deliveryDetail};
+	</update>
+	<update id="setProductSellSwUpdate">
+		update products set sellSw=#{sellSw} where idx=#{idx};
+	</update>
+	
+	<delete id="setOptionDelete">
+		delete from dbOption where idx =#{idx};
+	</delete>
+	<delete id="setProductDelete">
+		delete from products where idx =#{idx};
+	</delete>
+	<delete id="setCategoryDelete">
+		delete from categorySmall where codeSmall=${codeSmall};
+	</delete>
+	<delete id="adminMemberDelete">
+		delete from members where mid =#{mid};
+	</delete>
+	
+</mapper>

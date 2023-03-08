@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.green2209S_20.dao.JoinsDAO">
+	
+	<select id="totRecCnt" resultType="int">
+		<if test="part!='sMid'">
+			select count(*) from joins where idx!=0 <if test="joinSw!=99"> and joinSw=#{joinSw}</if><if test="joinSw==99"> and joinSw!=0 </if> ;
+		</if>
+		<if test="part=='sMid'">
+			select count(*) from joins where idx!=0 <if test="joinSw!=99"> and joinSw=#{joinSw}</if><if test="part=='sMid'"> and mid=#{search} </if> ;
+		</if>
+	</select>
+	<select id="getJoinsList" resultType="com.spring.green2209S_20.vo.JoinsVO">
+		<if test="part!='sMid'">
+			select * from joins where idx!=0 <if test="joinSw!=99"> and joinSw=#{joinSw} </if><if test="joinSw==99"> and joinSw!=0 </if> order by idx desc limit #{startIndexNo},#{pageSize};
+		</if>
+		<if test="part=='sMid'">
+			select * from joins where idx!=0 <if test="joinSw!=99"> and joinSw=#{joinSw} </if><if test="part=='sMid'"> and mid=#{search} </if> order by idx desc limit #{startIndexNo},#{pageSize};
+		</if>
+	</select>
+	<select id="getJoin" resultType="com.spring.green2209S_20.vo.JoinsVO">
+		select * from joins where idx=#{idx};
+	</select>
+	<select id="getjoinsProductList" resultType="com.spring.green2209S_20.vo.JoinProductVO">
+		select * from joinProduct where joinsIdx=#{idx};
+	</select>
+	<select id="getJoinsProductsList" resultType="com.spring.green2209S_20.vo.JoinProductVO">
+		select * from joinProduct;
+	</select>
+	<select id="totRequestCnt" resultType="String">
+		select count(*) from joinRequest r, joinProduct p, joins j 
+		where r.productIdx = p.idx and p.joinsIdx = j.idx 
+	 	<if test="part!=''"><if test="search!=''"> and ${part} like concat('%',#{search},'%') </if></if>
+	 	<if test="startDate!=''"> and <![CDATA[r.rDate>=#{startDate}]]> </if>
+		<if test="lastDate!=''"> and <![CDATA[r.rDate<=#{lastDate}]]> </if>
+		;
+	</select>
+	<select id="getRequestList" resultType="com.spring.green2209S_20.vo.JoinsRequestVO">
+		select r.*,p.productName as productName,p.productUnit as productUnit,j.comname as comname
+		 from joinrequest r,joins j,joinproduct p
+		 where p.idx = r.productIdx and p.joinsIdx = j.idx
+	 	<if test="part!=''"><if test="search!=''"> and ${part} like concat('%',#{search},'%') </if></if>
+	 	<if test="startDate!=''"> and <![CDATA[r.rDate>=#{startDate}]]> </if>
+		<if test="lastDate!=''"> and <![CDATA[r.rDate<=#{lastDate}]]> </if>
+		 order by idx desc limit #{startIndexNo},#{pageSize};
+	</select>
+	
+	
+	<insert id="setJoinsInput">
+		insert into joins values(default,#{vo.mid},#{vo.name},'',#{vo.comname},#{vo.tel},#{vo.email},#{vo.part},'',#{vo.content},'','',0,0,now(),joinSw);
+	</insert>
+	<insert id="setJoinProduct">
+		insert into joinProduct values(default,#{vo.joinsIdx},#{vo.productName},#{vo.productUnit});
+	</insert>
+	<insert id="setJoinsRequest">
+		insert into joinRequest values (default, #{vo.productIdx},#{vo.productNum},#{vo.content},default,default)
+	</insert>
+	
+	
+	<update id="setJoinsUpdate">
+		update joins set mid =#{vo.mid} , name=#{vo.name} ,fSName=#{vo.FSName}, comname=#{vo.comname}, compart=#{vo.compart}, tel =#{vo.tel},comaddress =#{vo.comaddress}, email=#{vo.email} , content =#{vo.content},memo =#{vo.memo},longitude =#{vo.longitude},latitude =#{vo.latitude},startDate=now(), joinSw=#{vo.joinSw} where idx =#{vo.idx};
+	</update>
+	<update id="setJoinsMemoUpdate">
+		update joins set  content =#{content}, joinSw =-1 where idx =#{idx};
+	</update>
+	<update id="setJoinProductUpdate">
+		update joinProduct set productName=#{vo.productName}, productUnit=#{vo.productUnit} where idx =#{vo.idx}
+	</update>
+	<update id="setJoinSwUpdate">
+		update joins set joinSw=#{joinSw} where idx =#{idx};
+	</update>
+	
+	<delete id="setJoinProductDelete">
+		delete from joinProduct where idx=#{idx};
+	</delete>
+	
+	
+</mapper>

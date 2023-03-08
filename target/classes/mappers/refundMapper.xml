@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.green2209S_20.dao.RefundDAO">
+
+	<select id="totRecCnt" resultType="String">
+		select count(*) from refund r  <if test="part=='sMid'"> where mid=#{search} </if>;
+	</select>
+	<select id="totRecAdminCnt" resultType="String">
+		select count(*) from refund r  where idx!=0
+		<if test="part!=''"><if test="search!=''"> and ${part} like concat('%',#{search},'%')  </if></if>
+		<if test="startDate!=''"> and <![CDATA[r.refundSw>=#{startDate}]]> </if>
+		<if test="lastDate!=''"> and <![CDATA[r.refundSw<=#{lastDate}]]> </if>
+		<if test="refundSw!='99'"> and refundSw = #{refundSw} </if>
+		;
+	</select>
+	<select id="getRefundList" resultType="com.spring.green2209S_20.vo.RefundVO">
+	 	select *,(select orderDate from orders where r.orderIdx=orderIdx limit 1) as oDate,
+	 	(select orderSw from orders where r.orderIdx=orderIdx limit 1) as orderSw
+	 	 from refund r 
+	 	<if test="part=='sMid'"> where mid=#{search} </if>
+	 	 order by idx desc limit #{startIndexNo},#{pageSize};
+	</select>
+	<select id="getRefundSearchList" resultType="com.spring.green2209S_20.vo.RefundVO">
+	 	select *,(select orderDate from orders where r.orderIdx=orderIdx limit 1) as oDate,
+	 	(select orderSw from orders where r.orderIdx=orderIdx limit 1) as orderSw
+	 	 from refund r where idx!=0
+	 	<if test="part!=''"><if test="search!=''"> and ${part} like concat('%',#{search},'%') </if></if>
+	 	<if test="startDate!=''"> and <![CDATA[r.rDate>=#{startDate}]]> </if>
+		<if test="lastDate!=''"> and <![CDATA[r.rDate<=#{lastDate}]]> </if>
+		<if test="refundSw!='99'"> and refundSw = #{refundSw} </if>
+	 	 order by idx desc limit #{startIndexNo},#{pageSize};
+	</select>
+	<select id="getRefund" resultType="com.spring.green2209S_20.vo.RefundVO">
+		select * from refund where idx=${idx};
+	</select>
+	
+	<insert id="setRefundInput">
+		insert into refund values (default,#{vo.code},#{vo.orderIdx},#{vo.oIdxs},#{vo.refundReason},#{vo.refundDetail},#{vo.mid},'1',default,#{vo.minusPoint},#{vo.plusPoint},#{vo.deliveryPrice},#{vo.couponUse},#{vo.totalRefund});
+	</insert>
+	
+	<update id="setRefundUpdateSw">
+		update refund set refundSw=#{sw} where idx =#{idx};
+	</update>
+	<update id="setRefundUpdatePrice">
+		update refund set minusPoint=#{vo.minusPoint},plusPoint=#{vo.plusPoint},deliveryPrice=#{vo.deliveryPrice},couponUse=#{vo.couponUse},totalRefund=#{vo.totalRefund},mid=#{vo.mid} where idx =#{vo.idx};
+	</update>
+	
+	
+</mapper>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.green2209S_20.dao.ChartDAO">
+
+	<select id="getProductNameByOrder" resultType="com.spring.green2209S_20.vo.ProductVO">
+		select *
+		,(select count(*) from orders o 
+		where p.idx = o.productIdx and o.orderDate>=#{startDate}
+		 and <![CDATA[o.orderDate<#{lastDate}]]> 
+		<if test="part=='level'"><if test="search==0"> and o.mid in (select mid from members where <![CDATA[level<3]]> ) </if></if>
+		<if test="part=='level'"><if test="search==3"> and o.mid in (select mid from members where level=3 ) </if></if>
+		<if test="part=='gender'"><if test="search=='남자'"> and o.mid in (select mid from members where ${part}=#{search} ) </if></if>
+		<if test="part=='gender'"><if test="search=='여자'"> and o.mid in (select mid from members where ${part}=#{search} ) </if></if>
+		  group by productIdx ) as sellCnt
+		 from products p order by sellCnt desc limit 7;
+	</select>
+	<select id="getTotalSellPrice" resultType="String" >
+		select sum(s.totalPrice) from orderSub s
+		 where s.oIdx in (select orderIdx from orders where DATE_FORMAT(orderDate,'%Y-%m-%d')=#{orderDate} and subSw=#{subSw}
+		<if test="part=='level'"><if test="search==0"> and mid in (select mid from members where <![CDATA[level<3]]> ) </if></if>
+		<if test="part=='level'"><if test="search==3"> and mid in (select mid from members where level=3 ) </if></if>
+		<if test="part=='gender'"><if test="search=='남자'"> and mid in (select mid from members where ${part}=#{search} ) </if></if>
+		<if test="part=='gender'"><if test="search=='여자'"> and mid in (select mid from members where ${part}=#{search} ) </if></if>
+		 );
+	</select> 
+	<select id="getOrdersByCategory" resultType="com.spring.green2209S_20.vo.CategorySmallVO">
+		select sum(optionNum) as cnt,sum(o.totalPrice) as price ,
+		(select smallName from categorySmall where codeSmall=p.codeSmall) as smallName
+		from orders o,products p
+		where orderSw>=0 and p.idx=o.productIdx and p.codeLarge=2 
+		and o.orderDate>=#{startDate} and <![CDATA[o.orderDate<#{lastDate}]]>
+		<if test="part=='level'"><if test="search==0"> and o.mid in (select mid from members where <![CDATA[level<3]]> ) </if></if>
+		<if test="part=='level'"><if test="search==3"> and o.mid in (select mid from members where level=3 ) </if></if>
+		<if test="part=='gender'"><if test="search=='남자'"> and o.mid in (select mid from members where ${part}=#{search} ) </if></if>
+		<if test="part=='gender'"><if test="search=='여자'"> and o.mid in (select mid from members where ${part}=#{search} ) </if></if>
+		group by p.codesmall;
+	</select>
+ 	<select id="getSubscribeCnt" resultType="int">
+		select count(*) from orders where <![CDATA[orderDate<#{orderDate}]]> and orderSw>0 and subSw='OK'
+		<if test="part=='level'"><if test="search==0"> and mid in (select mid from members where <![CDATA[level<3]]> ) </if></if>
+		<if test="part=='level'"><if test="search==3"> and mid in (select mid from members where level=3 ) </if></if>
+		<if test="part=='gender'"><if test="search=='남자'"> and mid in (select mid from members where ${part}=#{search} ) </if></if>
+		<if test="part=='gender'"><if test="search=='여자'"> and mid in (select mid from members where ${part}=#{search} ) </if></if>
+		;
+	</select>
+	<select id="getMemberGenderCnt" resultType="int" >
+		select count(*) from members where <![CDATA[startDate<#{startDate}]]> and gender=#{gender} and <![CDATA[level<3]]>;
+	</select>
+	<select id="getMemberComCnt" resultType="int" >
+		select count(*) from members where <![CDATA[startDate<#{startDate}]]> and level=3;
+	</select>
+	<select id="getOrdersMid" resultType="com.spring.green2209S_20.vo.ChartVO" >
+		select sum(totalPrice) as cnt ,mid from orders where orderSw>0 group by mid order by cnt desc limit 7;
+	</select>
+	<select id="getTodayMember" resultType="int">
+		select count(*) from members where  DATE_FORMAT(startDate,'%Y-%m-%d')=#{startDate};
+	</select>
+
+	
+</mapper>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.green2209S_20.dao.SubscribeDAO">
+	
+	<select id="getSubContent" resultType="com.spring.green2209S_20.vo.CategoryLargeVO">
+		select * from categoryLarge where codeLarge =#{codeLarge};
+	</select>
+	<select id="getSubscribeList" resultType="com.spring.green2209S_20.vo.SubscribeVO">
+		select * from subscribe where oIdx=#{oIdx} order by idx desc;
+	</select>
+	<select id="getProductList" resultType="com.spring.green2209S_20.vo.ProductVO">
+		select *,
+		(select count(*) from orders where orderSw!=0 and p.idx=productIdx) as orders, 
+		(select count(*) from boards r,orders o where p.idx=o.productIdx and o.idx = r.oidx) as reviews
+		from products p where name like concat('%',#{search},'%') 
+		order by  ${orderBy} desc ;
+	</select>
+	
+	<insert id="setSubscribeInput">
+		insert into subscribe values (default,#{vo.OIdx},#{vo.content},#{vo.address},default);
+	</insert>
+	
+	<update id="setSubscribeStop">
+		update orders set subSw=#{subSw} where idx = #{oIdx};
+	</update>
+	<update id="setOrdersSubUpdate">
+		update orders set name=#{vo.name},address=#{vo.address},email=#{vo.email},tel=#{vo.tel},optionDetail=#{vo.optionDetail} where idx=#{vo.idx};
+	</update>
+	
+</mapper>
