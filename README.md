@@ -1,6 +1,6 @@
 # 온라인 과일 쇼핑몰
 
-<img src="https://user-images.githubusercontent.com/109835921/223698920-eb17566e-bdd1-42f4-999a-ed2944957fbf.png"  width="90%"></img>
+<img src="https://user-images.githubusercontent.com/109835921/223698920-eb17566e-bdd1-42f4-999a-ed2944957fbf.png"  width="100%"></img>
 
 <table>
   <tr>
