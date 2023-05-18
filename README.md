@@ -3,7 +3,7 @@
 
 > 상품을 주문하며, 후기 게시판 작성, 설문조사 참여 등을 할 수 있습니다.
 
-# Main Page
+## Main Page
 
 <img src="https://user-images.githubusercontent.com/109835921/239238802-b6b1a030-48a1-4ce9-a8f4-e0994e618387.jpeg" width="100%"></img>
 <table>
