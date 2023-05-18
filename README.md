@@ -44,6 +44,12 @@
 
 <br/>
 
+## 데이터베이스 설계
+
+<img src="https://user-images.githubusercontent.com/109835921/239251909-7aec0aaf-a0ec-42fd-bd94-7f3737779ee0.png" width="100%"/>
+<br/>
+
+
 ## Main Page
 
 <img src="https://user-images.githubusercontent.com/109835921/239238802-b6b1a030-48a1-4ce9-a8f4-e0994e618387.jpeg" width="100%"></img>
