@@ -3,7 +3,7 @@
 <p align="center"> <a href="https://www.java.com" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/java/java-original.svg" alt="java" width="40" height="40"/> </a> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg" alt="javascript" width="40" height="40"/> </a> <a href="https://www.mysql.com/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/mysql/mysql-original-wordmark.svg" alt="mysql" width="40" height="40"/> </a> <a href="https://spring.io/" target="_blank" rel="noreferrer"> <img src="https://www.vectorlogo.zone/logos/springio/springio-icon.svg" alt="spring" width="40" height="40"/> </a> </p>
 
 > 상품을 주문하며, 후기 게시판 작성, 설문조사 참여 등을 할 수 있습니다. [보러가기](http://49.142.157.251:9090/green2209S_20/)
-
+<br/>
 ## 개발 개요
 
 <b> 개발 동기</b> : 개발자 교육 과정 중 세번째 프로젝트, 구독 시스템이 많아진 요즘 건강한 과일의 구독에 대한 프로젝트를 만들어보았다.<br/>
@@ -32,6 +32,15 @@
   </tr>
 </table>
 <br/>
+
+## 개발 환경
+- 개발 언어 : JAVA, JS, JSP, JQuery, HTML, CSS
+- 개발 프로그램 :  spring-tool-suit 4.14.1
+- 데이터베이스 : MySQL5.7
+- 서버 : Apache Tomcat 9.0
+- 에디터:  ckeditor_4.10.0 
+- 기타 : HeidiSQL 12.0
+
 
 ## Main Page
 
