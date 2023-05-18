@@ -2,7 +2,7 @@
 <br/>
 <p align="center"> <a href="https://www.java.com" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/java/java-original.svg" alt="java" width="40" height="40"/> </a> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg" alt="javascript" width="40" height="40"/> </a> <a href="https://www.mysql.com/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/mysql/mysql-original-wordmark.svg" alt="mysql" width="40" height="40"/> </a> <a href="https://spring.io/" target="_blank" rel="noreferrer"> <img src="https://www.vectorlogo.zone/logos/springio/springio-icon.svg" alt="spring" width="40" height="40"/> </a> </p>
 
-> 상품을 주문하며, 후기 게시판 작성, 설문조사 참여 등을 할 수 있습니다.
+> 상품을 주문하며, 후기 게시판 작성, 설문조사 참여 등을 할 수 있습니다. [보러가기](http://49.142.157.251:9090/green2209S_20/)
 
 ## 개발 개요
 
@@ -50,6 +50,6 @@
   </tr>
   <tr>
     <th>프로젝트 주소</th>
-  <td>http://49.142.157.251:9090/green2209S_20/</td>
+  <td></td>
   </tr>
 </table>
